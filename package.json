@@ -1,0 +1,21 @@
+{
+  "name": "playgroundforeuro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "await-to-js": "^2.0.1",
+    "cheerio": "^1.0.0-rc.2",
+    "magnet-uri": "^5.1.7",
+    "mongoose": "^5.0.9",
+    "puppeteer": "^1.1.1"
+  },
+  "dependencies": {
+    "jsonfile": "^4.0.0"
+  }
+}
