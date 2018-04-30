@@ -13,7 +13,8 @@
     "cheerio": "^1.0.0-rc.2",
     "magnet-uri": "^5.1.7",
     "mongoose": "^5.0.9",
-    "puppeteer": "^1.1.1"
+    "puppeteer": "^1.1.1",
+    "request": "^2.85.0"
   },
   "dependencies": {
     "jsonfile": "^4.0.0"
