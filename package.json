@@ -10,11 +10,14 @@
   "license": "ISC",
   "devDependencies": {
     "await-to-js": "^2.0.1",
+    "base-64": "^0.1.0",
     "cheerio": "^1.0.0-rc.2",
+    "encrypter": "^1.0.0",
     "magnet-uri": "^5.1.7",
     "mongoose": "^5.0.9",
     "puppeteer": "^1.1.1",
-    "request": "^2.85.0"
+    "request": "^2.85.0",
+    "utf8": "^3.0.0"
   },
   "dependencies": {
     "jsonfile": "^4.0.0"
