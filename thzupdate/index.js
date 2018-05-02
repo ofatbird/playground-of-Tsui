@@ -4,6 +4,8 @@ const to = require('await-to-js').to
 const jsonfile = require('jsonfile')
 const fs = require('fs')
 
+const baseUri = 'http://taohuabt.cc/'
+
 const utf8 = require('utf8')
 const base64 = require('base-64')
 
@@ -27,7 +29,7 @@ function update() {
         const tmpData = {}
         while (start < 100) {
             console.log(start)
-            const [error, html] = await to(fetch(`http://taohuabt.cc/forum-220-${start}.html`))
+            const [error, html] = await to(fetch(`${baseUri}forum-220-${start}.html`))
             if (error) {
                 console.log(error)
                 continue
@@ -51,7 +53,6 @@ function fetchAndGetId(uri) {
     return new Promise(async (resolve, reject) => {
         const [err, html] = await to(fetch(uri))
         if (err) {
-            console.log('something wrong')
             reject(err)
         } else {
             const $ = cheerio.load(html)
@@ -76,13 +77,17 @@ function fetchAndGetId(uri) {
 //     }
 // })
 
-function decode (str) {
+function decode(str) {
     return utf8.decode(base64.decode(str))
 }
-fetchAndGetId('http://taohuabt.cc/thread-977162-1-1.html').then(res => {
+fetchAndGetId(`${baseUri}thread-977162-1-1.html`).then(res => {
+    if (!res) {
+        console.log('something wrong')
+        return false
+    }
     try {
-        request(`http://taohuabt.cc/forum.php?mod=attachment&aid=${res.id}`)
-        .pipe(fs.createWriteStream(`./data/${res.name}`))
+        request(`${baseUri}forum.php?mod=attachment&aid=${res.id}`)
+            .pipe(fs.createWriteStream(`./data/${res.name}`))
     } catch (err) {
         console.log(err)
     }
