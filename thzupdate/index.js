@@ -9,7 +9,7 @@ const base64 = require('base-64')
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-function fetch (uri) {
+function fetch(uri) {
     return new Promise((resolve, reject) => {
         request(uri, (error, response, body) => {
             if (error) {
@@ -25,7 +25,7 @@ function update() {
     return new Promise(async (resolve, reject) => {
         let start = 1
         const tmpData = {}
-        while(start < 100){
+        while (start < 100) {
             console.log(start)
             const [error, html] = await to(fetch(`http://taohuabt.cc/forum-220-${start}.html`))
             if (error) {
@@ -47,6 +47,43 @@ function update() {
     })
 }
 
+function fetchAndGetId(uri) {
+    return new Promise(async (resolve, reject) => {
+        const [err, html] = await to(fetch(uri))
+        if (err) {
+            console.log('something wrong')
+            reject(err)
+        } else {
+            const $ = cheerio.load(html)
+            const $a = $('.attnm>a')
+            resolve({
+                id: $a.attr('href').split(',')[1],
+                name: $a.text()
+            })
+        }
+    })
+
+}
+
 // update().then(data => {
 //     jsonfile.writeFileSync('./data/feed.json', data, {flag: 'a'})
 // })
+// request('http://taohuabt.cc/thread-977162-1-1.html', (err, res, body) => {
+//     if (err) {
+//         console.log(err)
+//     } else {
+//         fs.writeFileSync('index.html', body)
+//     }
+// })
+
+function decode (str) {
+    return utf8.decode(base64.decode(str))
+}
+fetchAndGetId('http://taohuabt.cc/thread-977162-1-1.html').then(res => {
+    try {
+        request(`http://taohuabt.cc/forum.php?mod=attachment&aid=${res.id}`)
+        .pipe(fs.createWriteStream(`./data/${res.name}`))
+    } catch (err) {
+        console.log(err)
+    }
+})
