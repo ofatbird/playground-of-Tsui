@@ -14,6 +14,7 @@ const types = {
 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+const isEmptyObject = obj => Object.keys(obj).length === 0 && obj.constructor === Object
 
 function fetch(uri) {
     return new Promise((resolve, reject) => {
@@ -97,8 +98,8 @@ async function getTorrent(data) {
         const response = await fetchAndGetId(uri)
         try {
             request(`${baseUri}forum.php?mod=attachment&aid=${response.id}`)
-                .pipe(fs.createWriteStream(`./data/resource/${response.name}`))
-            request(response.cover).pipe(fs.createWriteStream(`./data/resource/${response.name}.jpg`))
+                .pipe(fs.createWriteStream(`${conf.dir}/${response.name}`))
+            request(response.cover).pipe(fs.createWriteStream(`${conf.dir}/${response.name}.jpg`))
         } catch (err) {
             console.log(err)
         }
@@ -115,8 +116,15 @@ async function getTorrent(data) {
 
 
 function download() {
-    fse.ensureDirSync(conf.dir)
-    update().then(data => getTorrent(data))
+    update().then(data => {
+        if (isEmptyObject(data)) {
+            const day = conf.recent
+            console.log(`There is no update in recent ${day > 1 ? day + 'days' : '1 day'}`)
+        } else {
+            fse.ensureDirSync(conf.dir)
+            getTorrent(data)
+        }
+    })
 }
 
 download()
