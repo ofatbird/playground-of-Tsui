@@ -13,6 +13,7 @@
     "base-64": "^0.1.0",
     "cheerio": "^1.0.0-rc.2",
     "encrypter": "^1.0.0",
+    "fs-extra": "^6.0.0",
     "magnet-uri": "^5.1.7",
     "mongoose": "^5.0.9",
     "puppeteer": "^1.1.1",

@@ -1,13 +1,17 @@
 const request = require('request')
 const cheerio = require('cheerio')
 const to = require('await-to-js').to
-const jsonfile = require('jsonfile')
 const fs = require('fs')
-
-const baseUri = 'http://taohuabt.cc/'
-
+const fse = require('fs-extra')
+const conf = require('./conf.json')
 const utf8 = require('utf8')
 const base64 = require('base-64')
+
+const baseUri = 'http://taohuabt.cc/'
+const types = {
+    "censored": 'forum-220',
+    "uncensored": 'forum-181'
+}
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -30,7 +34,7 @@ function update() {
         const tmpData = {}
         while (start < 100) {
             console.log(start)
-            const [error, html] = await to(fetch(`${baseUri}forum-220-${start}.html`))
+            const [error, html] = await to(fetch(`${baseUri}${types[conf.type]}-${start}.html`))
             if (error) {
                 console.log(error)
                 continue
@@ -41,15 +45,15 @@ function update() {
             $new.find('a.s.xst').each((_, el) => {
                 const date = $new.eq(_).next().find('span').eq(1).attr('title')
                 const gap = (Date.now() - new Date(date.replace(/\-/g, '/'))) / (24 * 60 * 60 * 1000)
-                if (Math.floor(gap) > 1) {
+                if (Math.floor(gap) > conf.recent) {
                     update = false
                     return
                 }
                 const $el = $(el)
                 const key = $el.attr('href')
-                if (key.indexOf('thread-213795-1-1') === -1) {
-                    tmpData[key] = base64.encode(utf8.encode($el.text()))
-                }
+                // if (key.indexOf('thread-213795-1-1') === -1) {
+                tmpData[key] = base64.encode(utf8.encode($el.text()))
+                // }
             })
             if (!update) {
                 break;
@@ -80,24 +84,11 @@ function fetchAndGetId(uri) {
 
 }
 
-// update().then(data => {
-//     jsonfile.writeFileSync('./data/update.json', data, {flag: 'a'})
-// })
-// request('http://taohuabt.cc/thread-977162-1-1.html', (err, res, body) => {
-//     if (err) {
-//         console.log(err)
-//     } else {
-//         fs.writeFileSync('index.html', body)
-//     }
-// })
-
 function decode(str) {
     return utf8.decode(base64.decode(str))
 }
-const latestData = jsonfile.readFileSync('./data/update.json')
-// Object.keys(latestData).forEach(key => {
-//     console.log(latestData[key])
-// })
+
+// const latestData = jsonfile.readFileSync(`./data/2018-5-3.json`)
 
 async function getTorrent(data) {
     const keys = Object.keys(data)
@@ -111,10 +102,21 @@ async function getTorrent(data) {
         } catch (err) {
             console.log(err)
         }
-
-        await sleep(12000)
-
+        await sleep(1500)
     }
 }
 
-getTorrent(latestData)
+
+// update().then(data => {
+//     jsonfile.writeFileSync(`./data/${new Date().toLocaleDateString().replace(/\//g, '-')}.json`, data, {flag: 'a'})
+// })
+
+// getTorrent(latestData)
+
+
+function download() {
+    fse.ensureDirSync(conf.dir)
+    update().then(data => getTorrent(data))
+}
+
+download()
